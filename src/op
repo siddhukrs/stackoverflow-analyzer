@@ -1,0 +1,19 @@
+imports:import java.util.HashSet;
+imports:import java.util.List;
+imports:import java.util.Set;
+imports:import org.eclipse.jdt.core.JavaModelException;
+imports:import org.eclipse.jdt.core.dom.AST;
+imports:import org.eclipse.jdt.core.dom.ASTParser;
+imports:import org.eclipse.jdt.core.dom.ASTVisitor;
+imports:import org.eclipse.jdt.core.dom.CompilationUnit;
+imports:import org.eclipse.jdt.core.dom.FieldDeclaration;
+imports:import org.eclipse.jdt.core.dom.MethodDeclaration;
+imports:import org.eclipse.jdt.core.dom.MethodInvocation;
+imports:import org.eclipse.jdt.core.dom.SimpleName;
+imports:import org.eclipse.jdt.core.dom.TypeDeclaration;
+superclass:ListActivity
+superinterface:intf1
+superinterface:intf2
+superclass:sc2
+superinterface:int4
+superinterface:int5
