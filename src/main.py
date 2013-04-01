@@ -15,6 +15,7 @@ from collections import defaultdict
 import re
 import shelve
 import numpy
+import matplotlib
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import pylab
@@ -198,12 +199,22 @@ list1=size1[x:y]
 list2=expand_size[x:y]
 #list1, list2 = zip(*sorted(zip(list1, list2)))
 #list1, list2 = (list(t) for t in zip(*sorted(zip(list1, list2))))
-rects1 = ax.bar(ind, list1, width, color='r')
-rects2 = ax.bar(ind+width, list2, width, color='y')
-
-plt.xlabel("Code snippet number")
-plt.ylabel("No. of API elements identified")
-ax.legend( (rects1[0], rects2[0]), ('API elements identified using our approach', 'API elements identified by keyword search') )
+rects1 = ax.bar(ind, list1, width, color='#333333')
+rects2 = ax.bar(ind+width, list2, width, color='#DDDDDD')
+from matplotlib.font_manager import FontProperties
+import matplotlib.font_manager as fm
+matplotlib.rcParams['ps.useafm']=True
+matplotlib.rcParams['pdf.use14corefonts']=True
+matplotlib.rcParams['text.usetex']=True
+#fontP = FontProperties()
+#fontP.set_size('small')
+#prop = fm.FontProperties(fname='/usr/share/fonts/truetype/freefont/FreeSans.ttf')
+#ax.set_title('This is some random font', fontproperties=prop, size=10)
+#fontP.set_family('sans-serif')
+font = { 'fontname':'Arial', 'fontsize':10 }
+plt.xlabel("Code snippet number",**font)
+plt.ylabel("No. of API elements identified",**font)
+ax.legend( (rects1[0], rects2[0]), ('API elements identified using our approach', 'API elements identified by lexical search'))
 
 plt.xlim([0,n])
 plt.savefig('/u3/s23subramanian/Desktop/fig3.pdf', dpi=None, facecolor='w', edgecolor='w',orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches=None, pad_inches=0.1)
