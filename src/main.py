@@ -44,7 +44,7 @@ def run_sql():
         posts=cur.fetchall()
         print "fetched"
         for row in posts:
-            print row
+            print str(row[4])+" : "+row[2]
     except psycopg2.DatabaseError,e:
         print 'Error %s' % e    
         sys.exit(1)    
@@ -67,7 +67,7 @@ def extract_code(text):
 
 def getresults():
     try:
-        conn = sqlite3.connect('/u3/s23subramanian/Desktop/extract_fields/code_final.db')
+        conn = sqlite3.connect('/home/s23subra/workspace/stackoverflow/code.db')
         c = conn.cursor()
         c.execute("select * from methods;")
         posts=c.fetchall()
@@ -82,7 +82,7 @@ def getresults():
 def getfromtypes(aid, codeid, prob):
     #print "select count(tname) from types where prob="+str(prob)+" and aid="+str(aid)+" and codeid="+str(codeid)+";"
     try:
-        conn = sqlite3.connect('/u3/s23subramanian/Desktop/extract_fields/code.db')
+        conn = sqlite3.connect('/home/s23subra/workspace/stackoverflow/code.db')
         c = conn.cursor()
         #print "select count(tname) from types where prob="+prob+" and aid="+aid+" and codeid="+codeid+";"
         c.execute("select count(tname) from types where prob="+str(prob)+" and aid="+str(aid)+" and codeid="+str(codeid)+";")
@@ -99,10 +99,6 @@ def getfromtypes(aid, codeid, prob):
 def generateXML():
     pass
 
-run_sql()
-
-
-'''
 lengthvector=[]
 posts=run_sql() 
 c=0  
@@ -136,7 +132,7 @@ print "c"+str(c)
 print "e"+str(e)                     
 tree = ET.ElementTree(root)
 tree.write('/u3/s23subramanian/Desktop/extract_fields/android_codes.xml', pretty_print=True, xml_declaration=True,encoding='utf-8')
-'''
+
 '''
 count=0
 aid=""
