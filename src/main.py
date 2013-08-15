@@ -7,6 +7,14 @@ count : 65095
 
 To update, rerun this query on pgAdmin
 CREATE TABLE android (title,qbody,abody,tags,qid,aid) as (WITH accepted_ques AS (SELECT title,body,id,accepted_answer_id FROM posts WHERE tags SIMILAR TO '%android%' AND accepted_answer_id IS NOT NULL) SELECT accepted_ques.title,accepted_ques.body,posts.body,posts.tags,accepted_ques.id,posts.id FROM posts,accepted_ques WHERE posts.id=accepted_ques.accepted_answer_id AND posts.body SIMILAR TO '%<code>%');
+---------------------
+TABLE : java
+SCHEMA : title | qbody | abody | tags| qid | aid
+Contains all posts from SO that are tagged java and have an accepted answer with code
+count : 234187
+
+To update, rerun this query on pgAdmin
+CREATE TABLE java (title,qbody,abody,tags,qid,aid) as (WITH accepted_ques AS (SELECT title,body,id,accepted_answer_id FROM posts WHERE tags SIMILAR TO '%java%' AND accepted_answer_id IS NOT NULL) SELECT accepted_ques.title,accepted_ques.body,posts.body,posts.tags,accepted_ques.id,posts.id FROM posts,accepted_ques WHERE posts.id=accepted_ques.accepted_answer_id AND posts.body SIMILAR TO '%<code>%');
 '''
 #######################################################################################
 import psycopg2
@@ -32,9 +40,11 @@ def run_sql():
     try:
         con = psycopg2.connect(database='stackoverflow', user='s23subra') 
         cur = con.cursor()
-        cur.execute("select * from android;")
+        cur.execute("select * from java limit 5;")
         posts=cur.fetchall()
         print "fetched"
+        for row in posts:
+            print row
     except psycopg2.DatabaseError,e:
         print 'Error %s' % e    
         sys.exit(1)    
@@ -88,6 +98,10 @@ def getfromtypes(aid, codeid, prob):
 
 def generateXML():
     pass
+
+run_sql()
+
+
 '''
 lengthvector=[]
 posts=run_sql() 
@@ -153,7 +167,7 @@ plt.savefig('/u3/s23subramanian/Desktop/methods.pdf', dpi=None, facecolor='w', e
 plt.show()
 '''
 
-count=0
+"""count=0
 aid=""
 codeid=""
 i=0
@@ -220,3 +234,4 @@ plt.xlim([0,n])
 plt.savefig('/u3/s23subramanian/Desktop/fig3.pdf', dpi=None, facecolor='w', edgecolor='w',orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches=None, pad_inches=0.1)
 plt.show()
 
+"""
