@@ -1,5 +1,7 @@
 ########################################################################################
 '''
+Start the postgres server: sudo /etc/init.d/postgresql start
+
 TABLE : android
 SCHEMA : title | qbody | abody | tags| qid | aid
 Contains all posts from SO that are tagged android and have an accepted answer with code
@@ -11,10 +13,12 @@ CREATE TABLE android (title,qbody,abody,tags,qid,aid) as (WITH accepted_ques AS 
 TABLE : java
 SCHEMA : title | qbody | abody | tags| qid | aid
 Contains all posts from SO that are tagged java and have an accepted answer with code
-count : 234187
+count : 110516
 
 To update, rerun this query on pgAdmin
-CREATE TABLE java (title,qbody,abody,tags,qid,aid) as (WITH accepted_ques AS (SELECT title,body,id,accepted_answer_id FROM posts WHERE tags SIMILAR TO '%java%' AND accepted_answer_id IS NOT NULL) SELECT accepted_ques.title,accepted_ques.body,posts.body,posts.tags,accepted_ques.id,posts.id FROM posts,accepted_ques WHERE posts.id=accepted_ques.accepted_answer_id AND posts.body SIMILAR TO '%<code>%');
+-- XX -> CREATE TABLE java (title,qbody,abody,tags,qid,aid) as (WITH accepted_ques AS (SELECT title,body,id,accepted_answer_id FROM posts WHERE tags SIMILAR TO '%<java>%' AND accepted_answer_id IS NOT NULL) SELECT accepted_ques.title,accepted_ques.body,posts.body,posts.tags,accepted_ques.id,posts.id FROM posts,accepted_ques WHERE posts.id=accepted_ques.accepted_answer_id AND posts.body SIMILAR TO '%<code>%');
+CREATE TABLE java (title,qbody,abody,tags,qid,aid) as (WITH accepted_ques AS (SELECT title,body,id,accepted_answer_id,tags FROM posts WHERE tags SIMILAR TO '%<java>%' AND accepted_answer_id IS NOT NULL) SELECT accepted_ques.title,accepted_ques.body,posts.body,accepted_ques.tags,accepted_ques.id,posts.id FROM posts,accepted_ques WHERE posts.id=accepted_ques.accepted_answer_id AND posts.body SIMILAR TO '%<code>%');
+ALTER TABLE java ADD COLUMN pk BIGSERIAL PRIMARY KEY;
 '''
 #######################################################################################
 import psycopg2
@@ -40,11 +44,11 @@ def run_sql():
     try:
         con = psycopg2.connect(database='stackoverflow', user='s23subra') 
         cur = con.cursor()
-        cur.execute("select * from java limit 5;")
+        cur.execute("select * from java;")
         posts=cur.fetchall()
-        print "fetched"
-        for row in posts:
-            print str(row[4])+" : "+row[2]
+        print "fetched all"
+        """for row in posts:
+            print str(row[4])+" : "+row[2]"""
     except psycopg2.DatabaseError,e:
         print 'Error %s' % e    
         sys.exit(1)    
@@ -64,7 +68,7 @@ def extract_code(text):
     regex="<code>(.+?)</code>"
     op=re.findall(regex,text.strip(),flags=re.DOTALL)
     return op
-
+"""
 def getresults():
     try:
         conn = sqlite3.connect('/home/s23subra/workspace/stackoverflow/code.db')
@@ -98,41 +102,42 @@ def getfromtypes(aid, codeid, prob):
 
 def generateXML():
     pass
-
-lengthvector=[]
-posts=run_sql() 
-c=0  
-e=0
-f=0
-root = ET.Element("android")
+"""
+parsed = 0
+printed = 0
+codeelements = 0
+posts=run_sql()
+root = ET.Element("java")
 for post in posts:
+    parsed = parsed +1
     accepted_code=extract_code(post[2])
     qid=post[4]
     aid=post[5]
+    codeid = -1
+    flag = 0
     for code in accepted_code:
+        codeid = codeid+1
         str1=code
         if get_linecount(code)>2:
-            if code.find("android:")==-1:
-                c=c+1
-                #print c
-                f=0
-                post = ET.SubElement(root, "post")
-                post.set("qid",str(qid))
-                post.set("aid",str(aid))
-                try:
-                    code = ET.SubElement(post,"code")
-                    code.text=unicode(str1)
-                except:
-                    #print str1+"\n------------------"
-                    e=e+1
-                    f=1
+            post = ET.SubElement(root, "post")
+            post.set("qid",str(qid))
+            post.set("aid",str(aid))
+            try:
+                code = ET.SubElement(post,"code")
+                code.set("id", str(codeid))
+                code.text=unicode(str1)
+                codeelements = codeelements +1
+                flag = 1
+            except:
+                print str1+"\n---------***---------"
+
+    if flag==1:
+        printed = printed +1
 
                 
-print "c"+str(c)
-print "e"+str(e)                     
 tree = ET.ElementTree(root)
-tree.write('/u3/s23subramanian/Desktop/extract_fields/android_codes.xml', pretty_print=True, xml_declaration=True,encoding='utf-8')
-
+tree.write('/home/s23subra/workspace/stackoverflow/java_codes.xml', pretty_print=True, xml_declaration=True,encoding='utf-8')
+print('parsed: ' + str(parsed) + ' printed: ' + str(printed) + ' code element count:' + str(codeelements))
 '''
 count=0
 aid=""
